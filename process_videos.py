@@ -4,13 +4,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-def get_ffmpeg_path():
+def get_ffmpeg_path(base_path):
     # 检查是否在可执行文件目录下有ffmpeg
-    if getattr(sys, 'frozen', False):
-        base_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
-    else:
-        base_path = os.path.dirname(os.path.abspath(__file__))
-    
     if os.name == 'nt':  # Windows系统
         ffmpeg_path = os.path.join(base_path, 'ffmpeg', 'ffmpeg.exe')
     else:  # 其他系统
@@ -78,7 +73,7 @@ def process_videos(base_path):
                     # 使用ffmpeg合并音视频
                     try:
                         cmd = [
-                            get_ffmpeg_path(),
+                            get_ffmpeg_path(base_path),
                             '-i', str(video_file),
                             '-i', str(audio_file),
                             '-c', 'copy',
@@ -103,6 +98,9 @@ def process_videos(base_path):
 
 if __name__ == "__main__":
     # 使用当前目录作为基础路径
-    base_path = os.path.dirname(os.path.abspath(__file__))
+    if getattr(sys, 'frozen', False):
+        base_path = os.path.dirname(sys.executable)
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
     print(base_path)
     process_videos(base_path)
